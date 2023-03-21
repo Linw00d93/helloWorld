@@ -1,0 +1,46 @@
+on:
+  push:
+   branches:
+    - 'main'
+    - 'master'
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setuping Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Set up Node.js 18.14.1
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18.14.1
+      - name: Setting Java Home
+        run: ls -lash && export JAVA_HOME=/Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.18-10/x64/Contents/Home/ && export JAVA_HOME=`/usr/libexec/java_home -v 1.11`
+      - name: Install dependencies
+        run: npm install --force && brew install watchman
+      - name: Install Android  SDK 
+        run: brew install --cask homebrew/cask-versions/temurin11 && npm install -g react-native-cli
+      - name: Setup ENV
+        run: export ANDROID_HOME=$HOME/Library/Android/sdk && export PATH=$PATH:$ANDROID_HOME/emulator && export PATH=$PATH:$ANDROID_HOME/platform-tool && export JAVA_HOME=/Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.18-10/x64/Contents/Home/
+      - name: Checking things 
+        run: cd android && ./gradlew --version && env
+      - name: Setup React Native   
+        run:  npx mkdirp android/app/src/main/assets/ && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
+      - name: Set up Node.js 12.16.1
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.16.1
+      - name: Install dependencies
+        run: npm install
+      - name: Install pod dependencies
+        run: |
+          cd ios && pod install    
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_13.2.1.app
+      - name: Xcode Version
+        run: /usr/bin/xcodebuild -version
