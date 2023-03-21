@@ -27,6 +27,11 @@ jobs:
         run: brew install --cask homebrew/cask-versions/temurin11 && npm install -g react-native-cli
       - name: Setup ENV
         run: export ANDROID_HOME=$HOME/Library/Android/sdk && export PATH=$PATH:$ANDROID_HOME/emulator && export PATH=$PATH:$ANDROID_HOME/platform-tool && export JAVA_HOME=/Users/runner/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.18-10/x64/Contents/Home/
+      - name: Super-Linter
+        uses: github/super-linter@v4.10.1
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          DEFAULT_BRANCH: master
       - name: Checking things 
         run: cd android && ./gradlew --version && env
       - name: Setup React Native   
